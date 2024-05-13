@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hangman</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 20px;
+  }
+  #wordToGuess {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  #wordDescription {
+    margin-bottom: 20px;
+  }
+  input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 10px;
+    margin-right: 10px;
+    width: 40px;
+    text-align: center;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h2>Hangman</h2>
+
+<div id="wordDescription"></div>
+<div id="wordToGuess"></div>
+
+<p>Guess a letter:</p>
+<input type="text" id="letterInput" maxlength="1">
+<button id="guessBtn">Guess</button>
+
+<p id="result"></p>
+
+<script>
+  const words = [
+    { word: 'HELLO', description: 'A common greeting' },
+    { word: 'WORLD', description: 'The planet we live on' },
+    { word: 'HANGMAN', description: 'A classic word guessing game' },
+    { word: 'JAVASCRIPT', description: 'A popular programming language for web development' },
+    { word: 'DEVELOPER', description: 'Someone who writes code' },
+    { word: 'COMPUTER', description: 'An electronic device for processing data' },
+    { word: 'PROGRAMMING', description: 'The process of writing code for software development' }
+  ];
+  const { word, description } = words[Math.floor(Math.random() * words.length)];
+  const wordDescriptionDiv = document.getElementById('wordDescription');
+  const wordDisplay = document.getElementById('wordToGuess');
+  const letterInput = document.getElementById('letterInput');
+  const guessBtn = document.getElementById('guessBtn');
+  const resultParagraph = document.getElementById('result');
+
+  let guessedLetters = [];
+  let numIncorrectGuesses = 0;
+
+  wordDescriptionDiv.textContent = `Description: ${description}`;
+
+  function displayWord() {
+    let displayString = '';
+    for (const letter of word) {
+      if (guessedLetters.includes(letter)) {
+        displayString += letter + ' ';
+      } else {
+        displayString += '_ ';
+      }
+    }
+    wordDisplay.textContent = displayString.trim();
+  }
+
+  function checkGuess() {
+    const letter = letterInput.value.toUpperCase();
+
+    if (guessedLetters.includes(letter)) {
+      resultParagraph.textContent = 'You already guessed that letter.';
+    } else if (word.includes(letter)) {
+      guessedLetters.push(letter);
+      displayWord();
+      if (!word.split('').some(char => !guessedLetters.includes(char))) {
+        resultParagraph.textContent = 'Congratulations! You guessed the word!';
+        guessBtn.disabled = true;
+      }
+    } else {
+      numIncorrectGuesses++;
+      if (numIncorrectGuesses === 6) {
+        resultParagraph.textContent = `Sorry, you lost! The word was "${word}".`;
+        guessBtn.disabled = true;
+      } else {
+        resultParagraph.textContent = `Incorrect guess! You have ${6 - numIncorrectGuesses} guesses remaining.`;
+      }
+    }
+
+    letterInput.value = '';
+    letterInput.focus();
+  }
+
+  displayWord();
+
+  guessBtn.addEventListener('click', checkGuess);
+  letterInput.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      checkGuess();
+    }
+  });
+</script>
+
+</body>
+</html>

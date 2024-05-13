@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hangman</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 20px;
+  }
+  #wordToGuess {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 10px;
+    margin-right: 10px;
+    width: 40px;
+    text-align: center;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h2>Hangman</h2>
+
+<div id="wordToGuess"></div>
+
+<p>Guess a letter:</p>
+<input type="text" id="letterInput" maxlength="1">
+<button id="guessBtn">Guess</button>
+
+<p id="result"></p>
+
+<a href="less-complex.html">Less Complex Hangman</a>
+
+<script>
+  const words = ['HELLO', 'WORLD', 'HANGMAN', 'JAVASCRIPT', 'DEVELOPER', 'COMPUTER', 'PROGRAMMING'];
+  const wordToGuess = words[Math.floor(Math.random() * words.length)];
+  const wordDisplay = document.getElementById('wordToGuess');
+  const letterInput = document.getElementById('letterInput');
+  const guessBtn = document.getElementById('guessBtn');
+  const resultParagraph = document.getElementById('result');
+
+  let guessedLetters = [];
+  let numIncorrectGuesses = 0;
+
+  function displayWord() {
+    let displayString = '';
+    for (const letter of wordToGuess) {
+      if (guessedLetters.includes(letter)) {
+        displayString += letter + ' ';
+      } else {
+        displayString += '_ ';
+      }
+    }
+    wordDisplay.textContent = displayString.trim();
+  }
+
+  function checkGuess() {
+    const letter = letterInput.value.toUpperCase();
+
+    if (guessedLetters.includes(letter)) {
+      resultParagraph.textContent = 'You already guessed that letter.';
+    } else if (wordToGuess.includes(letter)) {
+      guessedLetters.push(letter);
+      displayWord();
+      if (!wordToGuess.split('').some(char => !guessedLetters.includes(char))) {
+        resultParagraph.textContent = 'Congratulations! You guessed the word!';
+        guessBtn.disabled = true;
+      }
+    } else {
+      numIncorrectGuesses++;
+      if (numIncorrectGuesses === 6) {
+        resultParagraph.textContent = `Sorry, you lost! The word was "${wordToGuess}".`;
+        guessBtn.disabled = true;
+      } else {
+        resultParagraph.textContent = `Incorrect guess! You have ${6 - numIncorrectGuesses} guesses remaining.`;
+      }
+    }
+
+    letterInput.value = '';
+    letterInput.focus();
+  }
+
+  displayWord();
+
+  guessBtn.addEventListener('click', checkGuess);
+  letterInput.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      checkGuess();
+    }
+  });
+</script>
+
+</body>
+</html>
